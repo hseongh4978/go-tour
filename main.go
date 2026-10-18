@@ -1,29 +1,20 @@
 package main
 
 import (
-	"strings"
-
-	"golang.org/x/tour/wc"
+	"fmt"
+	"math"
 )
 
-func WordCount(s string) map[string]int {
-	m := make(map[string]int)
-
-	for _, word := range strings.Fields(s) {
-		_, ok := m[word]
-
-		if ok {
-			m[word] = m[word] + 1
-			continue
-		}
-
-		m[word] = 1
-
-	}
-
-	return m
+func compute(fn func(float64, float64) float64) float64 {
+	return fn(3, 4)
 }
 
 func main() {
-	wc.Test(WordCount)
+	hypot := func(x, y float64) float64 {
+		return math.Sqrt(x*x + y*y)
+	}
+	fmt.Println(hypot(5, 12))
+
+	fmt.Println(compute(hypot))
+	fmt.Println(compute(math.Pow))
 }
