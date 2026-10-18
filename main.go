@@ -1,19 +1,29 @@
 package main
 
-import "fmt"
+import (
+	"strings"
 
-func main() {
+	"golang.org/x/tour/wc"
+)
+
+func WordCount(s string) map[string]int {
 	m := make(map[string]int)
 
-	m["Answer"] = 42
-	fmt.Println("The value:", m["Answer"])
+	for _, word := range strings.Fields(s) {
+		_, ok := m[word]
 
-	m["Answer"] = 48
-	fmt.Println("The value:", m["Answer"])
+		if ok {
+			m[word] = m[word] + 1
+			continue
+		}
 
-	delete(m, "Answer")
-	fmt.Println("The value:", m["Answer"])
+		m[word] = 1
 
-	v, ok := m["Answer"]
-	fmt.Println("The value:", v, "Present?", ok)
+	}
+
+	return m
+}
+
+func main() {
+	wc.Test(WordCount)
 }
