@@ -1,24 +1,18 @@
 package main
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
 func main() {
-	board := [][]string{
-		{"-", "-", "-"},
-		{"-", "-", "-"},
-		{"-", "-", "-"},
-	}
+	var s []int
+	printSlice(s)
 
-	board[0][0] = "X"
-	board[2][2] = "O"
-	board[1][2] = "X"
-	board[1][0] = "O"
-	board[0][2] = "X"
+	s = append(s, 0)
+	printSlice(s)
 
-	for i := 0; i < len(board); i++ {
-		fmt.Printf("%s\n", strings.Join(board[i], ""))
-	}
+	s = append(s, 2, 3, 4)
+	printSlice(s)
+}
+
+func printSlice(s []int) {
+	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
