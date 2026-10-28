@@ -2,48 +2,34 @@ package main
 
 import (
 	"fmt"
-
-	"golang.org/x/tour/tree"
+	"sync"
+	"time"
 )
 
-func Walk(t *tree.Tree, ch chan int) {
-	var walk func(t *tree.Tree)
-	walk = func(t *tree.Tree) {
-		if t == nil {
-			return
-		}
-		walk(t.Left)
-		ch <- t.Value
-		walk(t.Right)
-	}
-
-	walk(t)
-	close(ch)
+type SafeCounter struct {
+	mu sync.Mutex
+	v  map[string]int
 }
 
-func Same(t1, t2 *tree.Tree) bool {
-	ch1, ch2 := make(chan int), make(chan int)
+func (c *SafeCounter) Inc(key string) {
+	c.mu.Lock()
+	c.v[key]++
+	c.mu.Unlock()
+}
 
-	go Walk(t1, ch1)
-	go Walk(t2, ch2)
-
-	for {
-		v1, ok1 := <-ch1
-		v2, ok2 := <-ch2
-
-		if v1 != v2 || ok1 != ok2 {
-			return false
-		}
-
-		if !ok1 {
-			break
-		}
-	}
-
-	return true
+func (c *SafeCounter) Value(key string) int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.v[key]
 }
 
 func main() {
-	fmt.Println(Same(tree.New(1), tree.New(1)))
-	fmt.Println(Same(tree.New(1), tree.New(2)))
+	c := SafeCounter{v: make(map[string]int)}
+
+	for range 1000 {
+		go c.Inc("someKey")
+	}
+
+	time.Sleep(time.Second)
+	fmt.Println(c.Value("somekey"))
 }
