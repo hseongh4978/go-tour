@@ -2,24 +2,28 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"math"
 )
 
-type MyError struct {
-	When time.Time
-	What string
+type ErrNegativeSqrt float64
+
+func (e ErrNegativeSqrt) Error() string {
+	return fmt.Sprintf("cannot 'Sqrt' negative number: %f", e)
 }
 
-func (e MyError) Error() string {
-	return fmt.Sprintf("at %v, %s", e.When, e.What)
-}
+func Sqrt(x float64) (float64, error) {
+	if x < 0 {
+		return x, ErrNegativeSqrt(x)
+	}
+	z := float64(1)
+	for math.Abs(z*z-x) > 1e-15 {
+		z -= (z*z - x) / (2 * z)
+	}
 
-func run() error {
-	return &MyError{time.Now(), "it didn't work"}
+	return z, nil
 }
 
 func main() {
-	if err := run(); err != nil {
-		fmt.Println(err)
-	}
+	fmt.Println(Sqrt(2))
+	fmt.Println(Sqrt(-2))
 }
