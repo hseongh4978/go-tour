@@ -1,31 +1,28 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-func fibonacci(c, quit chan int) {
-	x, y := 0, 1
+func main() {
+	start := time.Now()
+	tick := time.Tick(100 * time.Millisecond)
+	boom := time.After(500 * time.Millisecond)
+	elapsed := func() time.Duration {
+		return time.Since(start).Round(time.Millisecond)
+	}
 
 	for {
 		select {
-		case c <- x:
-			x, y = y, x+y
-		case <-quit:
-			fmt.Println("quit")
+		case <-tick:
+			fmt.Printf("[%6s] tick.\n", elapsed())
+		case <-boom:
+			fmt.Printf("[%6s] BOOM!\n", elapsed())
 			return
+		default:
+			fmt.Printf("[%6s]     .\n", elapsed())
+			time.Sleep(50 * time.Millisecond)
 		}
 	}
-}
-
-func main() {
-	c := make(chan int)
-	quit := make(chan int)
-
-	go func() {
-		for range 10 {
-			fmt.Println(<-c)
-		}
-		quit <- 0
-	}()
-
-	fibonacci(c, quit)
 }
