@@ -1,30 +1,21 @@
 package main
 
-import (
-	"image"
-	"image/color"
+import "fmt"
 
-	"golang.org/x/tour/pic"
-)
+func Index[T comparable](s []T, x T) int {
+	for i, v := range s {
+		if v == x {
+			return i
+		}
+	}
 
-type Image struct {
-	w, h int
-}
-
-func (img Image) ColorModel() color.Model {
-	return color.RGBAModel
-}
-
-func (img Image) Bounds() image.Rectangle {
-	return image.Rect(0, 0, img.w, img.h)
-}
-
-func (img Image) At(x, y int) color.Color {
-	v := uint8(x ^ y)
-	return color.RGBA{v, v, 255, 255}
+	return -1
 }
 
 func main() {
-	m := Image{256, 256}
-	pic.ShowImage(m)
+	si := []int{10, 20, 15, -10}
+	fmt.Println(Index(si, 15))
+
+	ss := []string{"foo", "bar", "baz"}
+	fmt.Println(Index(ss, "hello"))
 }
