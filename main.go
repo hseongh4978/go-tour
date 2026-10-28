@@ -2,27 +2,48 @@ package main
 
 import (
 	"fmt"
-	"time"
+
+	"golang.org/x/tour/tree"
 )
 
-func main() {
-	start := time.Now()
-	tick := time.Tick(100 * time.Millisecond)
-	boom := time.After(500 * time.Millisecond)
-	elapsed := func() time.Duration {
-		return time.Since(start).Round(time.Millisecond)
+func Walk(t *tree.Tree, ch chan int) {
+	var walk func(t *tree.Tree)
+	walk = func(t *tree.Tree) {
+		if t == nil {
+			return
+		}
+		walk(t.Left)
+		ch <- t.Value
+		walk(t.Right)
 	}
 
+	walk(t)
+	close(ch)
+}
+
+func Same(t1, t2 *tree.Tree) bool {
+	ch1, ch2 := make(chan int), make(chan int)
+
+	go Walk(t1, ch1)
+	go Walk(t2, ch2)
+
 	for {
-		select {
-		case <-tick:
-			fmt.Printf("[%6s] tick.\n", elapsed())
-		case <-boom:
-			fmt.Printf("[%6s] BOOM!\n", elapsed())
-			return
-		default:
-			fmt.Printf("[%6s]     .\n", elapsed())
-			time.Sleep(50 * time.Millisecond)
+		v1, ok1 := <-ch1
+		v2, ok2 := <-ch2
+
+		if v1 != v2 || ok1 != ok2 {
+			return false
+		}
+
+		if !ok1 {
+			break
 		}
 	}
+
+	return true
+}
+
+func main() {
+	fmt.Println(Same(tree.New(1), tree.New(1)))
+	fmt.Println(Same(tree.New(1), tree.New(2)))
 }
