@@ -1,18 +1,27 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
-type Person struct {
-	Name string
-	Age  int
-}
+type IPAddr [4]byte
 
-func (p Person) String() string {
-	return fmt.Sprintf("%v (%v years)", p.Name, p.Age)
+func (ipAddr IPAddr) String() string {
+	ip := make([]string, len(ipAddr))
+	for i, _ip := range ipAddr {
+		ip[i] = strconv.Itoa(int(_ip))
+	}
+	return strings.Join(ip, ".")
 }
 
 func main() {
-	a := Person{"Arthur Dent", 42}
-	z := Person{"Zaphod Beeblebrow", 9001}
-	fmt.Println(a, z)
+	hosts := map[string]IPAddr{
+		"loopback":  {127, 0, 0, 1},
+		"googleDNS": {8, 8, 8, 8},
+	}
+	for name, ip := range hosts {
+		fmt.Printf("%v: %v\n", name, ip)
+	}
 }
